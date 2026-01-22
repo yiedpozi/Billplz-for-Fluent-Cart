@@ -21,7 +21,7 @@ Accept payment using Billplz by using this plugin.
 2. Navigate to **Plugins** > **Installed Plugins**.
 3. Find **Billplz for Fluent Cart** in the plugins list and click **Settings** to configure.
 4. Enter your API credentials in the payment settings.
-   - You can obtain your API credentials from your [Billplz dashboard](https://www.billplz.com/enterprise/setting).
+   - You can obtain your API credentials from your [Billplz dashboard](https://dashboard.billplz.com/enterprise/setting).
 5. Enable **Payment Activation** to activate Billplz as a payment method.
 6. Click **Save Settings**.
 
