@@ -135,11 +135,11 @@ class Billplz_FluentCart_Handler
         ];
 
         // Limit string length
-        $params['description'] = mb_substr( $params['description'], 0, 200 );
-        $params['reference_1_label'] = mb_substr( $params['reference_1_label'], 0, 20 );
-        $params['reference_2_label'] = mb_substr( $params['reference_2_label'], 0, 20 );
-        $params['reference_1_value'] = mb_substr( $params['reference_1_value'], 0, 120 );
-        $params['reference_2_value'] = mb_substr( $params['reference_2_value'], 0, 120 );
+        $params['description'] = mb_substr( $params['description'] ?: '', 0, 200 );
+        $params['reference_1_label'] = mb_substr( $params['reference_1_label'] ?: '', 0, 20 );
+        $params['reference_2_label'] = mb_substr( $params['reference_2_label'] ?: '', 0, 20 );
+        $params['reference_1'] = mb_substr( $params['reference_1'] ?: '', 0, 120 );
+        $params['reference_2'] = mb_substr( $params['reference_2'] ?: '', 0, 120 );
 
         list( $code, $response ) = $this->billplz->create_bill( $params );
 
