@@ -397,7 +397,7 @@ class Billplz_FluentCart_Gateway extends AbstractPaymentGateway
                 ];
             }
         } catch ( Exception $e ) {
-            $logger->error( 'Get Webhook Rank Error', 'Response: ' . json_encode( $response ) );
+            $logger->error( 'Get Webhook Rank Error', $e->getMessage() );
 
             return [
                 'status' => 'failed',
