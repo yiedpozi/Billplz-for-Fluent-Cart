@@ -61,9 +61,10 @@ class Billplz_FluentCart_Handler
      * 
      * @since 1.0.0
      * 
+     * @param \FluentCart\App\Models\Order $order
      * @return Billplz_FluentCart_API|WP_Error
      */
-    private function initApi(): Billplz_FluentCart_API|WP_Error
+    private function initApi( Order $order ): Billplz_FluentCart_API|WP_Error
     {
         $this->apiKey = $this->settings->getApiKey();
         $this->xsignatureKey = $this->settings->getXsignatureKey();
@@ -105,7 +106,7 @@ class Billplz_FluentCart_Handler
 			return new WP_Error( 'unsupported_currency', __( 'Unsupported currency.', 'billplz-for-fluent-cart' ) );
         }
 
-        $api = $this->initApi();
+        $api = $this->initApi( $order );
 
         if ( is_wp_error( $api ) ) {
             $this->logger->error( 'Initialize API Error', 'Failed to initialize Billplz API: ' . $api->get_error_message() );
@@ -181,7 +182,18 @@ class Billplz_FluentCart_Handler
      */
     public function handleIpn(): void
     {
-        $api = $this->initApi();
+        $billId = $_POST['id'] ?? $_GET['billplzid'];
+
+        // Find order transaction by bill ID
+        $orderTransaction = OrderTransaction::query()
+            ->where( 'vendor_charge_id', $billId )
+            ->first();
+
+        if ( !$orderTransaction ) {
+            throw new Exception( 'Transaction not found' );
+        }
+
+        $api = $this->initApi( $orderTransaction->order );
 
         if ( is_wp_error( $api ) ) {
             throw new Exception( $api->get_error_message() );
@@ -191,16 +203,6 @@ class Billplz_FluentCart_Handler
 
         if ( $this->billplz->validate_ipn_response( $response ) ) {
             $this->logger->info( 'IPN Received', 'Successfully validate IPN response. Response: ' . json_encode( $response ) );
-
-            $billId = $response['id'] ?? $response['billplzid'];
-
-            $orderTransaction = OrderTransaction::query()
-                ->where( 'vendor_charge_id', $billId )
-                ->first();
-
-            if ( !$orderTransaction ) {
-                throw new Exception( 'Transaction not found' );
-            }
 
             $this->handlePaymentUpdated( $orderTransaction, $response );
         }
