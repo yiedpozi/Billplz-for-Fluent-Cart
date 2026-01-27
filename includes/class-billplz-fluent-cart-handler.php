@@ -24,6 +24,100 @@ class Billplz_FluentCart_Handler
     private bool $sandbox;
 
     /**
+     * Bank codes and title.
+     * 
+     * @since 1.0.0
+     */
+    protected array $banks = [
+        'ABMB0212' => 'allianceonline',
+        'ABB0233' => 'affinOnline',
+        'ABB0234' => 'Affin Bank',
+        'AMBB0209' => 'AmOnline',
+        'AGRO01' => 'AGRONet',
+        'BCBB0235' => 'CIMB Clicks',
+        'BIMB0340' => 'Bank Islam Internet Banking',
+        'BKRM0602' => 'i-Rakyat',
+        'BMMB0341' => 'i-Muamalat',
+        'BOCM01' => 'Bank of China',
+        'BSN0601' => 'myBSN',
+        'CIT0219' => 'Citibank Online',
+        'HLB0224' => 'HLB Connect',
+        'HSBC0223' => 'HSBC Online Banking',
+        'KFH0346' => 'KFH Online',
+        'MB2U0227' => 'Maybank2u',
+        'MBB0228' => 'Maybank2E',
+        'OCBC0229' => 'OCBC Online Banking',
+        'PBB0233' => 'PBe',
+        'RHB0218' => 'RHB Now',
+        'SCB0216' => 'SC Online Banking',
+        'UOB0226' => 'UOB Internet Banking',
+        'UOB0229' => 'UOB Bank',
+        'TEST0001' => 'Test 0001',
+        'TEST0002' => 'Test 0002',
+        'TEST0003' => 'Test 0003',
+        'TEST0004' => 'Test 0004',
+        'TEST0021' => 'Test 0021',
+        'TEST0022' => 'Test 0022',
+        'TEST0023' => 'Test 0023',
+        'BP-FKR01' => 'Billplz Simulator',
+        'BP-BILLPLZ1' => 'Visa / Mastercard (Billplz)',
+        'BP-PPL01' => 'PayPal',
+        'BP-OCBC1' => 'Visa / Mastercard',
+        'BP-2C2P1' => 'e-pay',
+        'BP-2C2PC' => 'Visa / Mastercard',
+        'BP-2C2PU' => 'UnionPay',
+        'BP-2C2PGRB' => 'Grab',
+        'BP-2C2PGRBPL' => 'GrabPayLater',
+        'BP-2C2PATOME' => 'Atome',
+        'BP-2C2PBST' => 'Boost',
+        'BP-2C2PTNG' => 'TnG',
+        'BP-2C2PSHPE' => 'Shopee Pay',
+        'BP-2C2PSHPQR' => 'Shopee Pay QR',
+        'BP-2C2PIPP' => 'IPP',
+        'BP-BST01' => 'Boost',
+        'BP-TNG01' => 'TouchNGo E-Wallet',
+        'BP-SGP01' => 'Senangpay',
+        'BP-BILM1' => 'Visa / Mastercard',
+        'BP-RZRGRB' => 'Grab',
+        'BP-RZRBST' => 'Boost',
+        'BP-RZRTNG' => 'TnG',
+        'BP-RZRPAY' => 'RazerPay',
+        'BP-RZRMB2QR' => 'Maybank QR',
+        'BP-RZRWCTP' => 'WeChat Pay',
+        'BP-RZRSHPE' => 'Shopee Pay',
+        'BP-MPGS1' => 'MPGS',
+        'BP-CYBS1' => 'Secure Acceptance',
+        'BP-EBPG1' => 'Visa / Mastercard',
+        'BP-EBPG2' => 'AMEX',
+        'BP-PAYDE' => 'Paydee',
+        'BP-MGATE1' => 'Visa / Mastercard / AMEX',
+        'B2B1-ABB0235' => 'AFFINMAX',
+        'B2B1-ABMB0213' => 'Alliance BizSmart',
+        'B2B1-AGRO02' => 'AGRONetBIZ',
+        'B2B1-AMBB0208' => 'AmAccess Biz',
+        'B2B1-BCBB0235' => 'BizChannel@CIMB',
+        'B2B1-BIMB0340' => 'Bank Islam eBanker',
+        'B2B1-BKRM0602' => 'i-bizRAKYAT',
+        'B2B1-BMMB0342' => 'iBiz Muamalat',
+        'B2B1-BNP003' => 'BNP Paribas',
+        'B2B1-CIT0218' => 'CitiDirect BE',
+        'B2B1-DBB0199' => 'Deutsche Bank Autobahn',
+        'B2B1-HLB0224' => 'HLB ConnectFirst',
+        'B2B1-HSBC0223' => 'HSBCnet',
+        'B2B1-KFH0346' => 'KFH Online',
+        'B2B1-MBB0228' => 'Maybank2E',
+        'B2B1-OCBC0229' => 'Velocity@ocbc',
+        'B2B1-PBB0233' => 'PBe',
+        'B2B1-PBB0234' => 'PB enterprise',
+        'B2B1-RHB0218' => 'RHB Reflex',
+        'B2B1-SCB0215' => 'SC Straight2Bank',
+        'B2B1-TEST0021' => 'SBI Bank A',
+        'B2B1-TEST0022' => 'SBI Bank B',
+        'B2B1-TEST0023' => 'SBI Bank C',
+        'B2B1-UOB0228' => 'UOB BIBPlus',
+    ];
+
+    /**
      * API class.
      * 
      * @since 1.0.0
@@ -61,10 +155,10 @@ class Billplz_FluentCart_Handler
      * 
      * @since 1.0.0
      * 
-     * @param \FluentCart\App\Models\Order $order
+     * @param \FluentCart\App\Models\Order|null $order
      * @return Billplz_FluentCart_API|WP_Error
      */
-    private function initApi( Order $order ): Billplz_FluentCart_API|WP_Error
+    private function initApi( ?Order $order = null ): Billplz_FluentCart_API|WP_Error
     {
         $this->apiKey = $this->settings->getApiKey();
         $this->xsignatureKey = $this->settings->getXsignatureKey();
@@ -94,9 +188,10 @@ class Billplz_FluentCart_Handler
      * Create a bill for order.
      * 
      * @param \FluentCart\App\Services\Payments\PaymentInstance $paymentInstance
+     * @param array $paymentArgs
      * @return array|WP_Error
      */
-    public function handlePayment( PaymentInstance $paymentInstance ): array|WP_Error
+    public function handlePayment( PaymentInstance $paymentInstance, array $paymentArgs = [] ): array|WP_Error
     {
         $order = $paymentInstance->order;
         $transaction = $paymentInstance->transaction;
@@ -115,7 +210,7 @@ class Billplz_FluentCart_Handler
         }
 
         $description = $order->order_items->implode( 'full_name', ', ' );
-        $selectedBank = null;
+        $bankCode = $paymentArgs['bank_code'] ?? null;
 
         $redirectUrl = $this->gateway->getSuccessUrl( $transaction );
         $callbackUrl = home_url( '?fluent-cart=fct_payment_listener_ipn&method=' . $this->gateway->getMeta( 'slug' ) );
@@ -129,8 +224,8 @@ class Billplz_FluentCart_Handler
             'redirect_url' => $redirectUrl,
             'callback_url' => $callbackUrl,
             'description' => $description,
-            'reference_1_label' => $selectedBank ? 'Bank Code' : null,
-            'reference_1' => $selectedBank ?? null,
+            'reference_1_label' => $bankCode ? 'Bank Code' : null,
+            'reference_1' => $bankCode ?? null,
             'reference_2_label' => 'Order ID',
             'reference_2' => $order->id,
         ];
@@ -243,5 +338,120 @@ class Billplz_FluentCart_Handler
         $orderTransaction->save();
 
         return ( new StatusHelper( $orderTransaction->order ) )->syncOrderStatuses( $orderTransaction );
+    }
+
+    /**
+     * Get payment gateways.
+     * 
+     * @since 1.0.0
+     * 
+     * @return array
+     */
+    public function getPaymentGateways(): array
+    {
+        $paymentGateways = get_transient( 'billplz_fluent_cart_payment_gateways' );
+
+        if ( !empty( $paymentGateways ) && is_array( $paymentGateways ) ) {
+            return $paymentGateways;
+        }
+
+        try {
+            $api = $this->initApi();
+            list( $code, $response ) = $this->billplz->get_payment_gateways();
+
+            if ( $code !== 200 ) {
+                $this->logger->error( 'Get Payment Gateways Error', 'Response: ' . json_encode( $response ) );
+                return [];
+            }
+
+            $paymentGateways = $response['payment_gateways'] ?? [];
+
+            if ( !empty( $paymentGateways ) && is_array( $paymentGateways ) ) {
+                set_transient( 'billplz_fluent_cart_payment_gateways', $paymentGateways, HOUR_IN_SECONDS );
+            }
+        } catch ( Exception $e ) {
+            $this->logger->error( 'Get Payment Gateways Error', $e->getMessage() );
+        }
+
+        return $paymentGateways;
+    }
+
+    /**
+     * Get enabled payment gateways for specified collection.
+     * 
+     * @since 1.0.0
+     * 
+     * @param string $collectionId
+     * @return array
+     */
+    public function getPaymentGatewaysForCollection( string $collectionId ): array
+    {
+        $activePaymentGateways = get_transient( 'billplz_fluent_cart_collection_payment_gateways' );
+
+        if ( !empty( $activePaymentGateways ) && is_array( $activePaymentGateways ) ) {
+            return $activePaymentGateways;
+        }
+
+        try {
+            $api = $this->initApi();
+            list( $code, $response ) = $this->billplz->get_payment_methods( $collectionId );
+
+            if ( $code !== 200 ) {
+                $this->logger->error( 'Get Collection Payment Gateways Error', 'Response: ' . json_encode( $response ) );
+                return [];
+            }
+
+            $paymentGateways = $response['payment_methods'] ?? [];
+            $activePaymentGateways = [];
+
+            if ( !empty( $paymentGateways ) && is_array( $paymentGateways ) ) {
+                foreach ( $paymentGateways as $paymentGateway ) {
+                    if ( $paymentGateway['active'] === true ) {
+                        $activePaymentGateways[] = $paymentGateway['code'];
+                    }
+                }
+
+                set_transient( 'billplz_fluent_cart_collection_payment_gateways', $activePaymentGateways, HOUR_IN_SECONDS );
+            }
+        } catch ( Exception $e ) {
+            $this->logger->error( 'Get Collection Payment Gateways Error', $e->getMessage() );
+        }
+
+        return $activePaymentGateways;
+    }
+
+    /**
+     * Get active (online) payment gateways.
+     * 
+     * @since 1.0.0
+     * 
+     * @param string $collectionId
+     * @return array
+     */
+    public function getActivePaymentGateways( string $collectionId ): array
+    {
+        $paymentGateways = $this->getPaymentGateways();
+        $collectionPaymentGateways = $this->getPaymentGatewaysForCollection( $collectionId );
+
+        if ( empty( $paymentGateways ) || empty( $collectionPaymentGateways ) ) {
+            return [];
+        }
+
+        $activePaymentGateways = [];
+
+        foreach ( $paymentGateways as $paymentGateway ) {
+            if ( $paymentGateway['active'] === true ) {
+                $bankCode = $paymentGateway['code'] ?? null;
+                $bankName = $this->banks[ $paymentGateway['code'] ] ?? null;
+
+                if ( $bankCode && $bankName ) {
+                    $activePaymentGateways[ $bankCode ] = $bankName;
+                }
+            }
+        }
+
+        natcasesort( $activePaymentGateways );
+
+        return $activePaymentGateways;
     }
 }

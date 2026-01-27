@@ -3,11 +3,13 @@
 if ( !defined( 'ABSPATH' ) ) exit;
 
 use FluentCart\Api\Orders;
+use FluentCart\App\App;
 use FluentCart\App\Helpers\Helper;
 use FluentCart\App\Helpers\Status;
 use FluentCart\App\Models\OrderTransaction;
 use FluentCart\App\Modules\PaymentMethods\Core\AbstractPaymentGateway;
 use FluentCart\App\Services\Payments\PaymentInstance;
+use FluentCart\App\Services\Renderer\FormFieldRenderer;
 use FluentCart\Framework\Support\Arr;
 
 /**
@@ -65,6 +67,7 @@ class Billplz_FluentCart_Gateway extends AbstractPaymentGateway
         parent::init();
 
         add_action( 'fluent_cart/before_render_redirect_page', [ $this, 'handleRedirect' ], 10, 4 );
+        add_action( 'fluent_cart/checkout_embed_payment_method_content', [ $this, 'renderBanksField' ] );
     }
 
     /**
@@ -93,7 +96,11 @@ class Billplz_FluentCart_Gateway extends AbstractPaymentGateway
      */
     public function makePaymentFromPaymentInstance( PaymentInstance $paymentInstance )
     {
-        $response = $this->paymentHandler->handlePayment( $paymentInstance );
+        $paymentArgs = [
+            'bank_code' => App::request()->get( 'billplz_bank' ),
+        ];
+
+        $response = $this->paymentHandler->handlePayment( $paymentInstance, $paymentArgs );
 
         if ( is_wp_error( $response ) ) {
             return [
@@ -120,6 +127,11 @@ class Billplz_FluentCart_Gateway extends AbstractPaymentGateway
             'vendor_charge_id' => $billId,
             'payment_mode' => $order->mode,
         ] );
+
+        // Append the bill URL to auto redirect to bank payment page
+        if ( $paymentArgs['bank_code'] ?? null ) {
+            $billUrl = add_query_arg( 'auto_submit', 'true', $billUrl );
+        }
 
         return [
             'status' => 'success',
@@ -406,5 +418,82 @@ class Billplz_FluentCart_Gateway extends AbstractPaymentGateway
         }
 
         return $data;
+    }
+
+    /**
+     * Render banks dropdown field.
+     * 
+     * @param array $data
+     * @return string
+     */
+    public function renderBanksField( array $data )
+    {
+        $method = $data['method'] ?? null;
+        $cart = $data['cart'] ?? null;
+        $route = $data['route'] ?? null;
+
+        if ( empty( $method ) || empty( $cart ) || empty( $route ) ) {
+            return;
+        }
+
+        // Bails for other payment method
+        if ( $route !== $this->getMeta( 'route' ) ) {
+            return;
+        }
+
+        $formRender = new FormFieldRenderer();
+        $title = __( 'Select any payment method', 'billplz-for-fluent-cart' );
+
+        $collectionId = $this->settings->getCollectionId();
+        $activePaymentGateways = $this->paymentHandler->getActivePaymentGateways( $collectionId );
+        $paymentOptions = [];
+
+        foreach ( $activePaymentGateways as $bankCode => $bankName ) {
+            $paymentOptions[] = [
+                'value' => $bankCode,
+                'name' => $bankName,
+            ];
+        }
+        ?>
+
+        <div class="fct_billplz_bank_wrapper fct-has-default-font-size">
+            <?php
+                $formRender->renderField( [
+                    'type' => 'select',
+                    'id' => 'billplz_bank',
+                    'name' => 'billplz_bank',
+                    'label' => $title,
+                    'options' => $paymentOptions,
+                    'value' => Arr::get( $cart->checkout_data, 'form_data.billplz_bank', '' ),
+                    'required' => true,
+                ] );
+            ?>
+        </div>
+        <?php
+    }
+
+    /**
+     * Enqueue styles.
+     * 
+     * @since 1.0.0
+     */
+    public function getEnqueueStyleSrc(): array
+    {
+        return [
+            [
+                'src' => BILLPLZ_FLUENTCART_URL . 'assets/css/style.css',
+                'handle' => 'styles',
+            ],
+        ];
+    }
+
+    /**
+     * Set enqueue version.
+     * 
+     * @since 1.0.0
+     */
+    public function getEnqueueVersion()
+    {
+        return BILLPLZ_FLUENTCART_VERSION;
     }
 }
