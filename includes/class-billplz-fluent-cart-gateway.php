@@ -333,6 +333,11 @@ class Billplz_FluentCart_Gateway extends AbstractPaymentGateway
                     ],
                 ],
             ],
+            'bypass_bill_page' => [
+                'type' => 'checkbox',
+                'label' => __( 'Bypass Billplz Bill Page', 'billplz-for-fluent-cart' ),
+                'value' => 'no',
+            ],
             'debug_mode' => [
                 'type' => 'checkbox',
                 'label' => __( 'Debug Mode', 'billplz-for-fluent-cart' ),
@@ -438,6 +443,12 @@ class Billplz_FluentCart_Gateway extends AbstractPaymentGateway
 
         // Bails for other payment method
         if ( $route !== $this->getMeta( 'route' ) ) {
+            return;
+        }
+
+        $bypassBillPage = $this->settings->get( 'bypass_bill_page' );
+
+        if ( $bypassBillPage !== 'yes') {
             return;
         }
 
