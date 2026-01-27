@@ -182,7 +182,7 @@ class Billplz_FluentCart_Handler
      */
     public function handleIpn(): void
     {
-        $billId = $_POST['id'] ?? $_GET['billplzid'];
+        $billId = $_POST['id'] ?? $_GET['billplz']['id'] ?? null;
 
         // Find order transaction by bill ID
         $orderTransaction = OrderTransaction::query()
