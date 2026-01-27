@@ -125,7 +125,7 @@ class Billplz_FluentCart_Handler
             'email' => $customer->email,
             'mobile' => $order->billing_address->phone ?? $order->shipping_address->phone,
             'name' => $customer->full_name,
-            'amount' => (int) $order->total_amount * 100,
+            'amount' => (int) $order->total_amount,
             'redirect_url' => $redirectUrl,
             'callback_url' => $callbackUrl,
             'description' => $description,
