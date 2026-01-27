@@ -279,6 +279,10 @@ class Billplz_FluentCart_Handler
     {
         $billId = $_POST['id'] ?? $_GET['billplz']['id'] ?? null;
 
+        if ( empty( $billId ) ) {
+            throw new Exception( 'Missing bill ID' );
+        }
+
         // Find order transaction by bill ID
         $orderTransaction = OrderTransaction::query()
             ->where( 'vendor_charge_id', $billId )
