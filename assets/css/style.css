@@ -1,0 +1,6 @@
+#fct_wrapper_billplz_bank {
+    padding: 0 0 15px;
+}
+#fct_wrapper_billplz_bank label[for="billplz_bank"] {
+    padding: 0 0 6px;
+}
